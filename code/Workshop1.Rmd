@@ -180,10 +180,11 @@ So let’s recap. A geom is an object that your plot uses to represent the data.
 ```{r}
 ggplot(data = mpg) + 
   #geom_point(mapping = aes(x = displ, y = hwy)) + # points horrible 
-  geom_smooth(mappings = aes(x = displ, y = hwy)) # try smooth line
+  geom_smooth(mapping = aes(x = displ, y = hwy)) # try smooth line
 ```
 
 Question: how does R work out where to plot the line??? Can use the chunk output to inform us. Can also use the help menu.
+"[38;5;232m`geom_smooth()` using method = 'loess' and formula = 'y ~ x'[39m"
 
 # Changing linetype
 ```{r}
@@ -211,7 +212,7 @@ ggplot(data = mpg) +
 We already did this one way
 ```{r}
 ggplot(data = mpg) + 
-  geom_point(mapping = aes(xx = displ, y = hwy)) +
+  geom_point(mapping = aes(x = displ, y = hwy)) +
   geom_smooth(mapping = aes(x = displ, y = hwy))
 ```
 
@@ -239,18 +240,26 @@ ggplot(data = mpg, mapping = aes(x = displ, y = hwy)) +
   geom_smooth(data = filter(mpg, class == "subcompact"), se = FALSE)
 ```
 Question: what does the "se = FALSE" do?
-
+it gets rid of the standard error shading surrounding the smooth line. = TRUE would bring it back
 
 # Exercise:
 1.  What geom would you use to draw a line chart? A boxplot? A histogram? An area chart?
 2.  Run this code in your head and predict what the output will look like. Then, run the code in R and check your predictions.
 
 ```{r}
-
+ggplot(data = mpg, mapping = aes(x = displ, y = hwy)) + 
+  geom_line()
+ggplot(data = mpg, mapping = aes(x = displ, y = hwy)) + 
+  geom_boxplot()
+ggplot(data = mpg, mapping = aes(x = displ)) + 
+  geom_histogram()
+ggplot(data = mpg, mapping = aes(x = displ, y = hwy)) + 
+  geom_area()
 ```
 
 
 3.  Will these two graphs look different? Why/why not?
+no, they're the same graphs just written in a different format, the first way is just a more concise way of writing the second
 ```{r}
 ggplot(data = mpg, mapping = aes(x = displ, y = hwy)) + 
   geom_point() + 
@@ -296,16 +305,19 @@ ggplot(data = demo) +
   geom_bar(mapping = aes(x = cut, y = freq), stat = "identity")
 ```
 Question: Why did we specify now specify a y axis?
+because its frequency instead of count
 
 # What if we want to know the proportion rather than the absolute frequency?
 ```{r}
 ggplot(data = diamonds) + 
-  geom_bar(mapping = aes(x = cut, y = stat(prop), group = 1))
+  geom_bar(mapping = aes(x = cut, y = after_stat(prop), group = 1))
 ```
 
 Question: does anyone get the warning that's in the workbook?
 Warning: `stat(prop)` was deprecated in ggplot2 3.4.0.
 If so, can use # geom_bar(mapping = aes(x = cut, y = stage(after_stat = prop), group = 1))
+
+yes, changed it to after_stat
 
 # Plotting statistical details
 ```{r}
@@ -329,6 +341,9 @@ ggplot(data = diamonds) +
   geom_bar(mapping = aes(x = cut, fill = cut))
 ```
 Question: Does anyone notice anything different in the colour scheme of this plot?
+
+it uses colors people with colorblindness can tell apart easily
+
 (Hint: It's in the viridis colour palette (colour blind friendly), but why is it different from the colour palette we used earlier?)
 Check out the difference:
 ```{r}
@@ -384,14 +399,193 @@ ggplot(data = mpg) +
   #geom_point(mapping = aes(x = displ, y = hwy), position = "jitter")
   geom_point(mapping = aes(x = displ, y = hwy))
 ```
+#### Workshop 1.2 -------------------------------------------------------------------------------------####
+# Labeling
+labs function to give title, subtitle, caption, etc.
+```{r}
+ggplot(mpg, aes(displ, hwy)) +
+  geom_point(aes(color = class)) +
+  geom_smooth(se = FALSE) +
+  labs(title = "Fuel efficiency generally decreases with engine size")
+
+#can also use subtitles and captions
+ggplot(mpg, aes(displ, hwy)) +
+  geom_point(aes(color = class)) +
+  geom_smooth(se = FALSE) +
+  labs(
+    title = "Fuel efficiency generally decreases with engine size",
+    subtitle = "Two seaters (sports cars) are an exception because of their light weight",
+    caption = "Data from fueleconomy.gov"
+  )
+
+# we can also change the x and y labels
+ggplot(mpg, aes(displ, hwy)) +
+  geom_point(aes(colour = class)) +
+  geom_smooth(se = FALSE) +
+  labs(
+    x = "Engine displacement (L)",
+    y = "Highway fuel economy (mpg)",
+    colour = "Car type"
+  )
+
+```
+
+# Annotations
+```{r}
+best_in_class <- mpg %>%
+  group_by(class) %>%
+  filter(row_number(desc(hwy)) == 1)
+
+ggplot(mpg, aes(displ, hwy)) +
+  geom_point(aes(colour = class)) +
+  geom_text(aes(label = model), data = best_in_class)
+# this includes words over certain points.. for this graph it doesnt quite work, they overlap. we may want to use a function like nudge()
+```
+
+# Scales
+```{r}
+ggplot(mpg, aes(displ, hwy)) +
+  geom_point(aes(colour = class)) # this follows the default scale that ggplot uses
+
+ggplot(mpg, aes(displ, hwy)) +
+  geom_point(aes(colour = class)) +
+  scale_x_continuous() +   # if we look at ?scale_x_continuous we can see other options for these scales, same for y.
+  scale_y_continuous() +
+  scale_colour_discrete()
+
+```
+
+# Axis Ticks
+```{r}
+ggplot(mpg, aes(displ, hwy)) +
+  geom_point() +
+  scale_y_continuous(breaks = seq(15, 40, by = 5))
+# seq means that the y axis goes from 15 to 40, going up by 5 each time.
+
+ggplot(mpg, aes(displ, hwy)) +
+  geom_point() +
+  scale_x_continuous(labels = NULL) + # NULL gets rid of the tick labels all together, no more numbers on the sides.
+  scale_y_continuous(labels = NULL)
+
+
+```
+
+# Legends and Color Schemes
+```{r}
+base <- ggplot(mpg, aes(displ, hwy)) +
+  geom_point(aes(colour = class))
+
+base + theme(legend.position = "left")
+base + theme(legend.position = "top")
+base + theme(legend.position = "bottom")
+base + theme(legend.position = "right") # the default
+
+#each one of these changes the position of the legend as it says
+```
+
+# Replacing a Scale
+```{r}
+ggplot(diamonds, aes(carat, price)) +
+  geom_bin2d() + 
+  scale_x_log10() + 
+  scale_y_log10() #used if we log transform data
+
+ggplot(mpg, aes(displ, hwy)) +
+  geom_point(aes(color = drv))
+# we can change the color scale
+ggplot(mpg, aes(displ, hwy)) +
+  geom_point(aes(color = drv)) +
+  scale_colour_brewer(palette = "Set1")
+
+ggplot(mpg, aes(displ, hwy)) +
+  geom_point(aes(color = drv, shape = drv)) + # this one adds shape so that even in black and white you can still differentiate the groups
+  scale_colour_brewer(palette = "Set1")
+
+presidential %>%
+  mutate(id = 33 + row_number()) %>%
+  ggplot(aes(start, id, colour = party)) +
+    geom_point() +
+    geom_segment(aes(xend = end, yend = id)) +
+    scale_colour_manual(values = c(Republican = "red", Democratic = "blue")) #if you want to use preset colors you can do that!
+
+
+```
+
+# Virdis Color scheme
+```{r}
+#install.packages('viridis')
+#install.packages('hexbin')
+#library(viridis)
+#library(hexbin)
+
+#df <- tibble( # note we're just making a fake dataset so we can plot it
+#  x = rnorm(10000),
+#  y = rnorm(10000)
+#)
+#ggplot(df, aes(x, y)) +
+#  geom_hex() + # a new geom!
+#  coord_fixed()
+
+#ggplot(df, aes(x, y)) +
+#  geom_hex() +
+#  viridis::scale_fill_viridis() +
+#  coord_fixed()
+
+```
+
+# Themes
+```{r}
+
+ggplot(mpg, aes(displ, hwy)) +
+  geom_point(aes(color = class)) +
+  geom_smooth(se = FALSE) +
+  theme_bw() #black axis, very light gridlines
+
+
+ggplot(mpg, aes(displ, hwy)) +
+  geom_point(aes(color = class)) +
+  geom_smooth(se = FALSE) +
+  theme_light() # light gridlines, grey axis
+
+
+ggplot(mpg, aes(displ, hwy)) +
+  geom_point(aes(color = class)) +
+  geom_smooth(se = FALSE) +
+  theme_classic() # good no grid lines, black axis
+
+
+ggplot(mpg, aes(displ, hwy)) +
+  geom_point(aes(color = class)) +
+  geom_smooth(se = FALSE) +
+  theme_dark() #dark background for graph and legend
+
+# OR you can develop your own theme:
+ggplot(mpg, aes(displ, hwy)) +
+  geom_point(aes(color = class)) +
+  geom_smooth(se = FALSE) +
+  theme (panel.border = element_blank(),
+        panel.grid.minor.x = element_blank(),
+        panel.grid.minor.y = element_blank(),
+        legend.position="bottom",
+        legend.title=element_blank(),
+        legend.text=element_text(size=8),
+        panel.grid.major = element_blank(),
+        legend.key = element_blank(),
+        legend.background = element_blank(),
+        axis.text.y=element_text(colour="black"),
+        axis.text.x=element_text(colour="black"),
+        text=element_text(family="Arial")) 
 
 
 
+```
 
+# Saving and exporting your plots
+```{r}
+ggplot(mpg, aes(displ, hwy)) + geom_point()
 
+ggsave("my-plot.pdf")
+#> Saving 7 x 4.32 in image
 
-
-
-
-
+```
 
