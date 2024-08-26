@@ -1,8 +1,8 @@
 ---
 title: "MB5370 Module 04. Workshop 1 - Introduction"
-author: "Ben Cresswell"
+author: "Saville Wall"
 output: html_document
-date: "2024-03-22"
+date: "2024-08-26"
 ---
 
 ```{r setup, include=FALSE}
@@ -12,8 +12,9 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # Install and load tidyverse packages
 ```{r}
-## install.packages("tidyverse") # Delete this line once installed
+# install.packages("tidyverse") # Delete this line once installed
 library("tidyverse")
+
 ```
 
 
@@ -34,15 +35,19 @@ summary(mpg)
 # Create first plot
 ```{r}
 ggplot(data = mpg) + 
-  geom_point(mapping = aes(x = disp, y = hwy))
+  geom_point(mapping = aes(x = displ, y = hwy))
 ```
 
 The plot shows a negative relationship between engine size (displ) and fuel efficiency (hwy). In other words, cars with big engines use more fuel. What does this say about fuel efficiency and engine size?
+
+The larget the engine, the less fuel efficient it will be.
 
 
 
 # Understanding grammar of graphics
 What happens if we just try to run ggplot on its own?
+
+it simply creates a blank plot
 ```{r}
 ggplot() 
 # Or with just the data specified?
@@ -70,6 +75,7 @@ ggplot(data = mpg) +
   geom_point(mapping = aes(x = displ, y = hwy, size = class))
 ```
 Note the warning!!!
+"Warning: [38;5;232mUsing [32msize[38;5;232m for a discrete variable is not advised.[39m"
 
 
 # Change transparency (alpha) by class
@@ -78,6 +84,7 @@ ggplot(data = mpg) +
   geom_point(mapping = aes(x = displ, y = hwy, alpha = class))
 ```
 Another warning!!
+"Warning: [38;5;232mUsing alpha for a discrete variable is not advised.[39m"
 Question: When would using alpha (or size be appropriate??)
 
 # Change point shape by class:
@@ -85,21 +92,30 @@ Question: When would using alpha (or size be appropriate??)
 ggplot(data = mpg) + 
   geom_point(mapping = aes(x = displ, y = hwy, shape = class))
 ```
-
+"Warning: [38;5;232mThe shape palette can deal with a maximum of 6 discrete values because more than 6 becomes difficult to discriminate [36mℹ[38;5;232m you have requested 7 values. Consider specifying shapes manually if you need that many have them.[39m
+Warning: [38;5;232mRemoved 62 rows containing missing values or values outside the scale range (`geom_point()`).[39m"
 
 # Make all points blue
 ```{r}
 ggplot(data = mpg) + 
   geom_point(mapping = aes(x = displ, y = hwy), color = "blue")
 ```
+What happens if you map an aesthetic to something other than a variable name?
+
+error, this isnt a color
+```{r}
+ggplot(data = mpg) + 
+  geom_point(mapping = aes(x = displ, y = hwy), color = "displ < 5")
+```
 
 
 # Troubleshooting 
 
-
-
-
-
+```{r}
+#ggplot(data = mpg) 
+#+ geom_point(mapping = aes(x = displ, y = hwy)) 
+# the + should be on top line so it will say "Error in `+.gg`(geom_point(mapping = aes(x = displ, y = hwy))) : Did you accidentally put `+` on a new line?"
+```
 
 # Faceting
 
@@ -135,7 +151,8 @@ ggplot(data = mpg) +
 Read ?facet_wrap. What does nrow do? What does ncol do? What other options control the layout of the individual panels? 
 
 ```{r}
-
+?facet_wrap
+#nrow means number of rows, ncol means number of columns... you can also change the scales, change the labeling, axes, etc.
 ```
 
 
@@ -143,7 +160,7 @@ Read ?facet_wrap. What does nrow do? What does ncol do? What other options contr
 We already used points:
 ```{r}
 ggplot(data = mpg) + 
-  geom_point(mapping = aes(x = displx, y = hwy))
+  geom_point(mapping = aes(x = displ, y = hwy))
 ```
 
 
@@ -155,7 +172,7 @@ ggplot(data = mpg) +
   geom_smooth(mapping = aes(x = displ, y = hwy))
 ```
 ### Question: whey don't we use geom_line() here? What would that look like? ###
-
+Line connects all the points instead of creating a smooth average line like we have from geom_smooth.
 
 So let’s recap. A geom is an object that your plot uses to represent the data. To change the geom type in your plot, simply change the geom function that you add to your plot template. Sometimes you may want to try a few things out, in which case you could use comments to help you remember what worked and what didn’t. 
 
