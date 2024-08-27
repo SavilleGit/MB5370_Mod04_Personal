@@ -1,0 +1,32 @@
+---
+title: "New Graph"
+author: "Saville Wall"
+date: "2024-08-27"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(readr)
+plot_data <- read_csv("~/Git/plot-data.csv")
+View(plot_data)
+```
+```{r}
+plot_data$SPP <- as.factor(plot_data$SPP)
+plot_data$LOC <- as.factor(plot_data$LOC)
+
+ggplot(data = plot_data, mapping = aes(x = SPP, y = NUM)) + 
+  geom_boxplot() +
+  facet_wrap(~ LOC, nrow = 1) +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) +
+  labs(
+    x = "Species by Ocean",
+    y = "Number of Particles"
+  )
+```
+
+

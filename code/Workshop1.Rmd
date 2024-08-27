@@ -399,7 +399,7 @@ ggplot(data = mpg) +
   #geom_point(mapping = aes(x = displ, y = hwy), position = "jitter")
   geom_point(mapping = aes(x = displ, y = hwy))
 ```
-#### Workshop 1.2 -------------------------------------------------------------------------------------####
+#### Workshop 2 -------------------------------------------------------------------------------------####
 # Labeling
 labs function to give title, subtitle, caption, etc.
 ```{r}
