@@ -23,7 +23,8 @@ ggplot(data = plot_data, mapping = aes(x = SPP, y = NUM, colour = SPP)) +
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) +
   labs(
     x = "Species by Ocean",
-    y = "Number of Particles"
+    y = "Number of Particles",
+    title = "Average Number Microplastics Consumed by Sea Turtle Species"
   )
 
 ggsave("new-plot.pdf")
